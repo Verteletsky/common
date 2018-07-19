@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"strings"
+	"github.com/Verteletsky/common-db/environments"
 )
 
 var database *gorm.DB
