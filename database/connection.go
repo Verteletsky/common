@@ -35,7 +35,7 @@ func Split(r rune) bool {
 }
 
 func Close() {
-	database.Close()
+	GetDB().Close()
 }
 
 func GetDB() *gorm.DB {
@@ -43,6 +43,22 @@ func GetDB() *gorm.DB {
 		database = Init()
 	}
 	return database
+}
+
+func Update(bean interface{}) error {
+	query := GetDB().Model(bean).Update(bean)
+	return query.Error
+}
+
+func Add(bean interface{}) error {
+	GetDB().NewRecord(bean)
+	db := GetDB().Create(bean)
+	return db.Error
+}
+
+func Remove(bean interface{}) error {
+	query := GetDB().Delete(bean)
+	return query.Error
 }
 
 func Migrate(models ...interface{}) {
