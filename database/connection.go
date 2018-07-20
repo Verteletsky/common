@@ -60,7 +60,3 @@ func Remove(bean interface{}) error {
 	query := GetDB().Delete(bean)
 	return query.Error
 }
-
-func Migrate(models ...interface{}) {
-	GetDB().AutoMigrate(models)
-}
