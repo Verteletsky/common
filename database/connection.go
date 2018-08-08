@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"strings"
-	"github.com/Verteletsky/common-db/environments"
+	"github.com/Verteletsky/common/environments"
+	"time"
 )
 
 var database *gorm.DB
@@ -41,6 +42,13 @@ func Close() {
 func GetDB() *gorm.DB {
 	if database == nil {
 		database = Init()
+		var sleep = time.Duration(1)
+		for database == nil {
+			sleep = sleep * 2
+			fmt.Printf("database is unavailable. wait for %d sec.\n", sleep)
+			time.Sleep(sleep * time.Second)
+			database = Init()
+		}
 	}
 	return database
 }
@@ -59,4 +67,13 @@ func Add(bean interface{}) error {
 func Remove(bean interface{}) error {
 	query := GetDB().Delete(bean)
 	return query.Error
+}
+
+func GetPageDB(page, limit int) *gorm.DB {
+	db := GetDB()
+	if limit > 0 {
+		db = db.Limit(limit)
+	}
+	db = db.Offset(page * limit)
+	return db
 }
