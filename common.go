@@ -24,10 +24,11 @@ type ErrorDto struct {
 	Message string `json:"message"`
 }
 type Error struct {
-	StatusCode int   `json:"-"`
-	Code       int   `json:"code"`
-	Error      error `json:"error"`
+	StatusCode int
+	Code       int
+	Error      error
 }
+
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 var database *gorm.DB
 
@@ -121,6 +122,6 @@ func Unauthorized() *Error {
 func SendResponse(context *gin.Context, response interface{}) {
 	context.JSON(http.StatusOK, gin.H{"response": response})
 }
-func SendError(context *gin.Context, error Error) {
+func SendError(context *gin.Context, error *Error) {
 	context.JSON(error.StatusCode, gin.H{"error": ErrorDto{error.Code, error.Error.Error()}})
 }
