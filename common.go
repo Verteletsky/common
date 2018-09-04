@@ -119,6 +119,19 @@ func Unauthorized() *Error {
 	return &Error{StatusCode: http.StatusUnauthorized, Code: InvalidToken, Error: errors.New("StatusUnauthorized")}
 }
 
+func Handle(context *gin.Context, f func(*gin.Context, chan interface{}, chan *Error)) {
+	respCh := make(chan interface{}, 1)
+	errorCh := make(chan *Error, 1)
+	go f(context, respCh, errorCh)
+	err := <-errorCh
+	if err != nil {
+		SendError(context, err)
+		return
+	}
+	SendResponse(context, <-respCh)
+}
+
+
 func SendResponse(context *gin.Context, response interface{}) {
 	context.JSON(http.StatusOK, gin.H{"response": response})
 }
