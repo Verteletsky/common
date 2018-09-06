@@ -29,6 +29,10 @@ type Error struct {
 	Error      error
 }
 
+type BaseResponse interface {
+	ErrorDto() *ErrorDto
+}
+
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 var database *gorm.DB
 
@@ -130,7 +134,6 @@ func Handle(context *gin.Context, f func(*gin.Context, chan interface{}, chan *E
 	}
 	SendResponse(context, <-respCh)
 }
-
 
 func SendResponse(context *gin.Context, response interface{}) {
 	context.JSON(http.StatusOK, gin.H{"response": response})
