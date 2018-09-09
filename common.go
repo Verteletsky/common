@@ -137,23 +137,23 @@ func Unauthorized() *Error {
 }
 
 type Response struct {
-	response interface{}
-	error    *Error
+	Response interface{}
+	Error    *Error
 }
 
 func MakeResponse(resp interface{}, err *Error) *Response{
-	return &Response{response:resp, error:err}
+	return &Response{Response:resp, Error:err}
 }
 
 func Handle(context *gin.Context, f func(*gin.Context, chan *Response)) {
 	responseCh := make(chan *Response)
 	go f(context, responseCh)
 	response := <-responseCh
-	if response.error != nil {
-		SendError(context, response.error)
+	if response.Error != nil {
+		SendError(context, response.Error)
 		return
 	}
-	SendResponse(context, response.response)
+	SendResponse(context, response.Response)
 }
 
 func SendResponse(context *gin.Context, response interface{}) {
