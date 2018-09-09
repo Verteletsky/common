@@ -33,6 +33,19 @@ type BaseResponse interface {
 	ErrorDto() *ErrorDto
 }
 
+type IntResponse struct {
+	Response uint      `json:"response"`
+	Error    *ErrorDto `json:"error"`
+}
+
+func (r *IntResponse) ErrorDto() *ErrorDto {
+	return r.Error
+}
+
+type Ids struct {
+	Ids [] int `json:"ids"`
+}
+
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 var database *gorm.DB
 
@@ -123,16 +136,24 @@ func Unauthorized() *Error {
 	return &Error{StatusCode: http.StatusUnauthorized, Code: InvalidToken, Error: errors.New("StatusUnauthorized")}
 }
 
-func Handle(context *gin.Context, f func(*gin.Context, chan interface{}, chan *Error)) {
-	respCh := make(chan interface{}, 1)
-	errorCh := make(chan *Error, 1)
-	go f(context, respCh, errorCh)
-	err := <-errorCh
-	if err != nil {
-		SendError(context, err)
+type Response struct {
+	response interface{}
+	error    *Error
+}
+
+func MakeResponse(resp interface{}, err *Error) *Response{
+	return &Response{response:resp, error:err}
+}
+
+func Handle(context *gin.Context, f func(*gin.Context, chan *Response)) {
+	responseCh := make(chan *Response)
+	go f(context, responseCh)
+	response := <-responseCh
+	if response.error != nil {
+		SendError(context, response.error)
 		return
 	}
-	SendResponse(context, <-respCh)
+	SendResponse(context, response.response)
 }
 
 func SendResponse(context *gin.Context, response interface{}) {
