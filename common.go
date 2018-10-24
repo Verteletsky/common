@@ -1,22 +1,27 @@
 package common
 
 import (
+	"errors"
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"github.com/json-iterator/go"
 	"io"
-	"github.com/jinzhu/gorm"
+	"net/http"
 	"os"
 	"strings"
-	"fmt"
 	"time"
-	"net/http"
-	"errors"
-	"github.com/gin-gonic/gin"
 )
 
 const (
-	UnknownError  = 999
 	IncorrectData = 1000
 	InvalidToken  = 1002
+
+	StatusDraft      = 1
+	StatusCancelled  = 2
+	StatusModeration = 3
+	StatusActive     = 4
+	StatusClosed     = 5
 )
 
 type ErrorDto struct {
@@ -43,7 +48,7 @@ func (r *IntResponse) ErrorDto() *ErrorDto {
 }
 
 type Ids struct {
-	Ids [] int `json:"ids"`
+	Ids []int `json:"ids"`
 }
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -117,17 +122,8 @@ func GetPageDB(page, limit int) *gorm.DB {
 	return db
 }
 
-func Unknown(err error) *Error {
-	return &Error{StatusCode: http.StatusOK, Code: UnknownError, Error: err}
-}
-func UnknownWithCode(code int, err error) *Error {
-	return &Error{StatusCode: http.StatusOK, Code: UnknownError, Error: err}
-}
-func Incorrect(err error) *Error {
-	return &Error{StatusCode: http.StatusOK, Code: IncorrectData, Error: err}
-}
-func IncorrectWithCode(code int, err error) *Error {
-	return &Error{StatusCode: http.StatusOK, Code: IncorrectData, Error: err}
+func Incorrect(err string) *Error {
+	return &Error{StatusCode: http.StatusOK, Code: IncorrectData, Error: errors.New(err)}
 }
 func Forbidden() *Error {
 	return &Error{StatusCode: http.StatusForbidden, Code: InvalidToken, Error: errors.New("StatusForbidden")}
@@ -141,8 +137,8 @@ type Response struct {
 	Error    *Error
 }
 
-func MakeResponse(resp interface{}, err *Error) *Response{
-	return &Response{Response:resp, Error:err}
+func MakeResponse(resp interface{}, err *Error) *Response {
+	return &Response{Response: resp, Error: err}
 }
 
 func Handle(context *gin.Context, f func(*gin.Context, chan *Response)) {
