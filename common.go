@@ -14,8 +14,11 @@ import (
 )
 
 const (
-	IncorrectData = 1000
-	InvalidToken  = 1002
+	IncorrectData       = 1000
+	UserBanned          = 1001
+	UserAlreadyBanned   = 1002
+	UserAlreadyUnbanned = 1003
+	InvalidToken        = 2000
 
 	StatusDraft      = 1
 	StatusCancelled  = 2
@@ -31,7 +34,7 @@ type ErrorDto struct {
 type Error struct {
 	StatusCode int
 	Code       int
-	Error      error
+	Message    string
 }
 
 type BaseResponse interface {
@@ -62,7 +65,7 @@ func Encode(writer io.WriteCloser, obj interface{}) error {
 }
 
 func Init() *gorm.DB {
-	postgresUrl := os.Getenv("POSTGRES_URL")
+	postgresUrl := os.Getenv("DB_URL")
 	parsed := strings.FieldsFunc(postgresUrl, Split)
 	driver := parsed[0]
 	driverArgs := fmt.Sprintf(
@@ -101,35 +104,29 @@ func GetDB() *gorm.DB {
 	return database
 }
 func Update(bean interface{}) error {
-	query := GetDB().Model(bean).Update(bean)
-	return query.Error
+	return GetDB().Model(bean).Update(bean).Error
 }
 func Add(bean interface{}) error {
-	GetDB().NewRecord(bean)
-	db := GetDB().Create(bean)
-	return db.Error
+	if !GetDB().NewRecord(bean) {
+		return errors.New("unable to create")
+	}
+	return GetDB().Create(bean).Error
 }
 func Remove(bean interface{}) error {
-	query := GetDB().Delete(bean)
-	return query.Error
-}
-func GetPageDB(page, limit int) *gorm.DB {
-	db := GetDB()
-	if limit > 0 {
-		db = db.Limit(limit)
-	}
-	db = db.Offset(page * limit)
-	return db
+	return GetDB().Delete(bean).Error
 }
 
+func CustomError(code int, err string) *Error {
+	return &Error{StatusCode: http.StatusOK, Code: code, Message: err}
+}
 func Incorrect(err string) *Error {
-	return &Error{StatusCode: http.StatusOK, Code: IncorrectData, Error: errors.New(err)}
+	return &Error{StatusCode: http.StatusOK, Code: IncorrectData, Message: err}
 }
 func Forbidden() *Error {
-	return &Error{StatusCode: http.StatusForbidden, Code: InvalidToken, Error: errors.New("StatusForbidden")}
+	return &Error{StatusCode: http.StatusForbidden, Code: InvalidToken, Message: "Forbidden"}
 }
 func Unauthorized() *Error {
-	return &Error{StatusCode: http.StatusUnauthorized, Code: InvalidToken, Error: errors.New("StatusUnauthorized")}
+	return &Error{StatusCode: http.StatusUnauthorized, Code: InvalidToken, Message: "Unauthorized"}
 }
 
 type Response struct {
@@ -156,7 +153,7 @@ func SendResponse(context *gin.Context, response interface{}) {
 	context.JSON(http.StatusOK, gin.H{"response": response})
 }
 func SendError(context *gin.Context, error *Error) {
-	context.JSON(error.StatusCode, gin.H{"error": ErrorDto{error.Code, error.Error.Error()}})
+	context.JSON(error.StatusCode, gin.H{"error": ErrorDto{error.Code, error.Message}})
 }
 func SendErrorDto(context *gin.Context, code int, error *ErrorDto) {
 	context.JSON(code, gin.H{"error": error})
