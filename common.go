@@ -14,12 +14,18 @@ import (
 )
 
 const (
-	incorrectData       = 1000
-	userAccessDenied    = 1001
-	userBanned          = 1002
-	userAlreadyBanned   = 1003
-	userAlreadyUnbanned = 1004
-	userInvalidToken    = 2000
+	accessDenied         = 1000
+	banned               = 1001
+	alreadyBanned        = 1002
+	alreadyUnbanned      = 1003
+	alreadyChanged       = 1004
+	statusIsNotExist     = 1005
+	objectIsNotExist     = 1006
+	incorrectField       = 1007
+	emptyField           = 1008
+	incorrectContentType = 1009
+	incorrectImageType   = 1010
+	userInvalidToken     = 2000
 
 	StatusModeration = 1
 	StatusActive     = 2
@@ -30,6 +36,50 @@ const (
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 var database *gorm.DB
+
+func StatusAlreadyChanged() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: alreadyChanged, Message: "status already changed"}
+}
+func StatusIsNotExist() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: statusIsNotExist, Message: "status is not exist"}
+}
+func IsNotExist(object string) *Error {
+	return &Error{StatusCode: http.StatusOK, Code: objectIsNotExist, Message: object + " is not exist"}
+}
+func IncorrectField(field string) *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectField, Message: "incorrect " + field}
+}
+func EmptyField(field string) *Error {
+	return &Error{StatusCode: http.StatusOK, Code: emptyField, Message: field + "can not be empty"}
+}
+func IncorrectContentType() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectContentType, Message: "incorrect content type"}
+}
+func IncorrectImageType() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectImageType, Message: "incorrect image type"}
+}
+func AccessDenied() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: accessDenied, Message: "access denied"}
+}
+func Banned() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: banned, Message: "user banned"}
+}
+func Incorrect(err error) *Error {
+	message := err.Error()
+	return &Error{StatusCode: http.StatusOK, Code: 999, Message: message}
+}
+func AlreadyBanned() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: alreadyBanned, Message: "user already banned"}
+}
+func AlreadyUnbanned() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: alreadyUnbanned, Message: "user already unbanned"}
+}
+func Forbidden() *Error {
+	return &Error{StatusCode: http.StatusForbidden, Code: userInvalidToken, Message: "forbidden"}
+}
+func Unauthorized() *Error {
+	return &Error{StatusCode: http.StatusUnauthorized, Code: userInvalidToken, Message: "unauthorized"}
+}
 
 type ErrorDto struct {
 	Code    int    `json:"code"`
@@ -112,30 +162,6 @@ func Add(bean interface{}) error {
 }
 func Remove(bean interface{}) error {
 	return GetDB().Delete(bean).Error
-}
-func CustomError(code int, err string) *Error {
-	return &Error{StatusCode: http.StatusOK, Code: code, Message: err}
-}
-func Incorrect(err string) *Error {
-	return &Error{StatusCode: http.StatusOK, Code: incorrectData, Message: err}
-}
-func AccessDenied() *Error {
-	return &Error{StatusCode: http.StatusOK, Code: userAccessDenied, Message: "access denied"}
-}
-func Banned() *Error {
-	return &Error{StatusCode: http.StatusOK, Code: userBanned, Message: "user banned"}
-}
-func AlreadyBanned() *Error {
-	return &Error{StatusCode: http.StatusOK, Code: userAlreadyBanned, Message: "user already banned"}
-}
-func AlreadyUnbanned() *Error {
-	return &Error{StatusCode: http.StatusOK, Code: userAlreadyUnbanned, Message: "user already unbanned"}
-}
-func Forbidden() *Error {
-	return &Error{StatusCode: http.StatusForbidden, Code: userInvalidToken, Message: "forbidden"}
-}
-func Unauthorized() *Error {
-	return &Error{StatusCode: http.StatusUnauthorized, Code: userInvalidToken, Message: "unauthorized"}
 }
 
 type Response struct {
