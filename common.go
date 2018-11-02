@@ -8,12 +8,15 @@ import (
 	"github.com/json-iterator/go"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
 )
 
 const (
+	unknownError         = 500
+	connectionError      = 501
 	accessDenied         = 1000
 	banned               = 1001
 	alreadyBanned        = 1002
@@ -65,8 +68,11 @@ func Banned() *Error {
 	return &Error{StatusCode: http.StatusOK, Code: banned, Message: "user banned"}
 }
 func Incorrect(err error) *Error {
-	message := err.Error()
-	return &Error{StatusCode: http.StatusOK, Code: 999, Message: message}
+	switch err.(type) {
+	case *url.Error:
+		return &Error{StatusCode: http.StatusOK, Code: connectionError, Message: "connection error"}
+	}
+	return &Error{StatusCode: http.StatusOK, Code: unknownError, Message: err.Error()}
 }
 func AlreadyBanned() *Error {
 	return &Error{StatusCode: http.StatusOK, Code: alreadyBanned, Message: "user already banned"}
