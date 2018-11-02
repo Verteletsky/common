@@ -14,18 +14,22 @@ import (
 )
 
 const (
-	IncorrectData       = 1000
-	UserBanned          = 1001
-	UserAlreadyBanned   = 1002
-	UserAlreadyUnbanned = 1003
-	InvalidToken        = 2000
+	incorrectData       = 1000
+	userAccessDenied    = 1001
+	userBanned          = 1002
+	userAlreadyBanned   = 1003
+	userAlreadyUnbanned = 1004
+	userInvalidToken    = 2000
 
-	StatusDraft      = 1
-	StatusCancelled  = 2
-	StatusModeration = 3
-	StatusActive     = 4
+	StatusModeration = 1
+	StatusActive     = 2
+	StatusDraft      = 3
+	StatusCancelled  = 4
 	StatusClosed     = 5
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
+var database *gorm.DB
 
 type ErrorDto struct {
 	Code    int    `json:"code"`
@@ -36,11 +40,9 @@ type Error struct {
 	Code       int
 	Message    string
 }
-
 type BaseResponse interface {
 	ErrorDto() *ErrorDto
 }
-
 type IntResponse struct {
 	Response uint      `json:"response"`
 	Error    *ErrorDto `json:"error"`
@@ -54,16 +56,12 @@ type Ids struct {
 	Ids []int `json:"ids"`
 }
 
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
-var database *gorm.DB
-
 func Decode(reader io.ReadCloser, obj interface{}) error {
 	return json.NewDecoder(reader).Decode(obj)
 }
 func Encode(writer io.WriteCloser, obj interface{}) error {
 	return json.NewEncoder(writer).Encode(obj)
 }
-
 func Init() *gorm.DB {
 	postgresUrl := os.Getenv("DB_URL")
 	parsed := strings.FieldsFunc(postgresUrl, Split)
@@ -115,18 +113,29 @@ func Add(bean interface{}) error {
 func Remove(bean interface{}) error {
 	return GetDB().Delete(bean).Error
 }
-
 func CustomError(code int, err string) *Error {
 	return &Error{StatusCode: http.StatusOK, Code: code, Message: err}
 }
 func Incorrect(err string) *Error {
-	return &Error{StatusCode: http.StatusOK, Code: IncorrectData, Message: err}
+	return &Error{StatusCode: http.StatusOK, Code: incorrectData, Message: err}
+}
+func AccessDenied() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: userAccessDenied, Message: "access denied"}
+}
+func Banned() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: userBanned, Message: "user banned"}
+}
+func AlreadyBanned() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: userAlreadyBanned, Message: "user already banned"}
+}
+func AlreadyUnbanned() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: userAlreadyUnbanned, Message: "user already unbanned"}
 }
 func Forbidden() *Error {
-	return &Error{StatusCode: http.StatusForbidden, Code: InvalidToken, Message: "Forbidden"}
+	return &Error{StatusCode: http.StatusForbidden, Code: userInvalidToken, Message: "forbidden"}
 }
 func Unauthorized() *Error {
-	return &Error{StatusCode: http.StatusUnauthorized, Code: InvalidToken, Message: "Unauthorized"}
+	return &Error{StatusCode: http.StatusUnauthorized, Code: userInvalidToken, Message: "unauthorized"}
 }
 
 type Response struct {
