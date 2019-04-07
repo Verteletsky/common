@@ -104,6 +104,11 @@ type IntResponse struct {
 	Error    *ErrorDto `json:"error"`
 }
 
+type StringResponse struct {
+	Response string    `json:"response"`
+	Error    *ErrorDto `json:"error"`
+}
+
 func (r *IntResponse) ErrorDto() *ErrorDto {
 	return r.Error
 }
