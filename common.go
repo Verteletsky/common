@@ -158,24 +158,16 @@ func GetDB() *gorm.DB {
 	return database
 }
 func Update(bean interface{}) error {
-	db := GetDB().Model(bean).Update(bean)
-	defer db.Close()
-	return db.Error
+	return GetDB().Model(bean).Update(bean).Error
 }
 func Add(bean interface{}) error {
-	db := GetDB()
-	if !db.NewRecord(bean) {
-		defer db.Close()
+	if !GetDB().NewRecord(bean) {
 		return errors.New("unable to create")
 	}
-	db.Create(bean)
-	defer db.Close()
-	return db.Error
+	return GetDB().Create(bean).Error
 }
 func Remove(bean interface{}) error {
-	db := GetDB().Delete(bean)
-	defer db.Close()
-	return db.Error
+	return GetDB().Delete(bean).Error
 }
 
 type Response struct {
