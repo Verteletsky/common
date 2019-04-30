@@ -141,6 +141,9 @@ func Split(r rune) bool {
 		r == ':' ||
 		r == '/'
 }
+func Close() {
+	GetDB().Close()
+}
 func GetDB() *gorm.DB {
 	if database == nil {
 		database = Init()
