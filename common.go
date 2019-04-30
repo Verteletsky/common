@@ -141,9 +141,6 @@ func Split(r rune) bool {
 		r == ':' ||
 		r == '/'
 }
-func Close() {
-	GetDB().Close()
-}
 func GetDB() *gorm.DB {
 	if database == nil {
 		database = Init()
@@ -158,16 +155,24 @@ func GetDB() *gorm.DB {
 	return database
 }
 func Update(bean interface{}) error {
-	return GetDB().Model(bean).Update(bean).Error
+	db := GetDB().Model(bean).Update(bean)
+	defer db.Close()
+	return db.Error
 }
 func Add(bean interface{}) error {
-	if !GetDB().NewRecord(bean) {
+	db := GetDB()
+	if !db.NewRecord(bean) {
+		defer db.Close()
 		return errors.New("unable to create")
 	}
-	return GetDB().Create(bean).Error
+	db.Create(bean)
+	defer db.Close()
+	return db.Error
 }
 func Remove(bean interface{}) error {
-	return GetDB().Delete(bean).Error
+	db := GetDB().Delete(bean)
+	defer db.Close()
+	return db.Error
 }
 
 type Response struct {
