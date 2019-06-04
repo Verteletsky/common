@@ -28,6 +28,7 @@ const (
 	emptyField           = 1008
 	incorrectContentType = 1009
 	incorrectImageType   = 1010
+	notVerified          = 1011
 	userInvalidToken     = 2000
 
 	StatusModeration = 1
@@ -63,6 +64,9 @@ func IncorrectImageType() *Error {
 }
 func AccessDenied() *Error {
 	return &Error{StatusCode: http.StatusOK, Code: accessDenied, Message: "access denied"}
+}
+func NotVerified() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: notVerified, Message: "user is not verified"}
 }
 func Banned() *Error {
 	return &Error{StatusCode: http.StatusOK, Code: banned, Message: "user banned"}
