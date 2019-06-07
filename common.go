@@ -24,12 +24,29 @@ const (
 	alreadyChanged       = 1004
 	statusIsNotExist     = 1005
 	objectIsNotExist     = 1006
-	incorrectField       = 1007
-	emptyField           = 1008
 	incorrectContentType = 1009
 	incorrectImageType   = 1010
 	notVerified          = 1011
-	userInvalidToken     = 2000
+	incorrectId          = 1012
+	incorrectUserId      = 1013
+	incorrectAlbumId     = 1014
+	incorrectAdvertType  = 1015
+	incorrectAdvertId    = 1016
+	incorrectObjectType  = 1017
+	incorrectBanType     = 1018
+	incorrectPhone       = 1019
+	incorrectCode        = 1020
+	incorrectData        = 1021
+	alreadyRegistered    = 1022
+	incorrectType        = 1023
+	incorrectChatId      = 1024
+	incorrectName        = 1025
+	incorrectToId        = 1026
+	incorrectTitle       = 1027
+	incorrectText        = 1027
+	incorrectKey         = 1027
+
+	userInvalidToken = 2000
 
 	StatusModeration = 1
 	StatusActive     = 2
@@ -50,11 +67,59 @@ func StatusIsNotExist() *Error {
 func IsNotExist(object string) *Error {
 	return &Error{StatusCode: http.StatusOK, Code: objectIsNotExist, Message: object + " is not exist"}
 }
-func IncorrectField(field string) *Error {
-	return &Error{StatusCode: http.StatusOK, Code: incorrectField, Message: "incorrect " + field}
+func IncorrectId() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectId, Message: "incorrect id"}
 }
-func EmptyField(field string) *Error {
-	return &Error{StatusCode: http.StatusOK, Code: emptyField, Message: field + "can not be empty"}
+func IncorrectUserId() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectUserId, Message: "incorrect user id"}
+}
+func IncorrectAlbumId() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectAlbumId, Message: "incorrect album id"}
+}
+func IncorrectAdvertType() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectAdvertType, Message: "incorrect advert type"}
+}
+func IncorrectAdvertId() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectAdvertId, Message: "incorrect advert id"}
+}
+func IncorrectObjectType() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectObjectType, Message: "incorrect object type"}
+}
+func IncorrectBanType() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectBanType, Message: "incorrect ban type"}
+}
+func IncorrectPhone() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectPhone, Message: "incorrect phone"}
+}
+func IncorrectCode() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectCode, Message: "incorrect code"}
+}
+func IncorrectData() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectData, Message: "incorrect data"}
+}
+func AlreadyRegistered() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: alreadyRegistered, Message: "user already registered"}
+}
+func IncorrectType() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectType, Message: "incorrect type"}
+}
+func IncorrectChatId() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectChatId, Message: "incorrect chat id"}
+}
+func IncorrectName() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectName, Message: "incorrect name"}
+}
+func IncorrectToId() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectToId, Message: "incorrect to id"}
+}
+func IncorrectTitle() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectTitle, Message: "incorrect title"}
+}
+func IncorrectText() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectText, Message: "incorrect text"}
+}
+func IncorrectKey() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectKey, Message: "incorrect key"}
 }
 func IncorrectContentType() *Error {
 	return &Error{StatusCode: http.StatusOK, Code: incorrectContentType, Message: "incorrect content type"}
@@ -72,6 +137,9 @@ func Banned() *Error {
 	return &Error{StatusCode: http.StatusOK, Code: banned, Message: "user banned"}
 }
 func Incorrect(err error) *Error {
+	if gorm.IsRecordNotFoundError(err) {
+		return &Error{StatusCode: http.StatusOK, Code: connectionError, Message: "connection error"}
+	}
 	switch err.(type) {
 	case *url.Error:
 		return &Error{StatusCode: http.StatusOK, Code: connectionError, Message: "connection error"}
