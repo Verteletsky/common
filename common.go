@@ -15,36 +15,37 @@ import (
 )
 
 const (
-	unknownError         = 500
-	connectionError      = 501
-	accessDenied         = 1000
-	banned               = 1001
-	alreadyBanned        = 1002
-	alreadyUnbanned      = 1003
-	alreadyChanged       = 1004
-	statusIsNotExist     = 1005
-	objectIsNotExist     = 1006
-	incorrectContentType = 1009
-	incorrectImageType   = 1010
-	notVerified          = 1011
-	incorrectId          = 1012
-	incorrectUserId      = 1013
-	incorrectAlbumId     = 1014
-	incorrectAdvertType  = 1015
-	incorrectAdvertId    = 1016
-	incorrectObjectType  = 1017
-	incorrectBanType     = 1018
-	incorrectPhone       = 1019
-	incorrectCode        = 1020
-	incorrectData        = 1021
-	alreadyRegistered    = 1022
-	incorrectType        = 1023
-	incorrectChatId      = 1024
-	incorrectName        = 1025
-	incorrectToId        = 1026
-	incorrectTitle       = 1027
-	incorrectText        = 1027
-	incorrectKey         = 1027
+	unknownError             = 500
+	connectionError          = 501
+	accessDenied             = 1000
+	banned                   = 1001
+	alreadyBanned            = 1002
+	alreadyUnbanned          = 1003
+	alreadyChanged           = 1004
+	statusIsNotExist         = 1005
+	objectIsNotExist         = 1006
+	incorrectContentType     = 1009
+	incorrectImageType       = 1010
+	notVerified              = 1011
+	incorrectId              = 1012
+	incorrectUserId          = 1013
+	incorrectAlbumId         = 1014
+	incorrectAdvertType      = 1015
+	incorrectAdvertId        = 1016
+	incorrectObjectType      = 1017
+	incorrectBanType         = 1018
+	incorrectPhone           = 1019
+	incorrectCode            = 1020
+	incorrectData            = 1021
+	incorrectLoginOrPassword = 1022
+	alreadyRegistered        = 1023
+	incorrectType            = 1024
+	incorrectChatId          = 1025
+	incorrectName            = 1026
+	incorrectToId            = 1027
+	incorrectTitle           = 1028
+	incorrectText            = 1029
+	incorrectKey             = 1030
 
 	userInvalidToken = 2000
 
@@ -96,6 +97,9 @@ func IncorrectCode() *Error {
 }
 func IncorrectData() *Error {
 	return &Error{StatusCode: http.StatusOK, Code: incorrectData, Message: "incorrect data"}
+}
+func IncorrectLoginOrPassword() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: incorrectLoginOrPassword, Message: "incorrect login or password"}
 }
 func AlreadyRegistered() *Error {
 	return &Error{StatusCode: http.StatusOK, Code: alreadyRegistered, Message: "user already registered"}
