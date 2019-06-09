@@ -48,6 +48,7 @@ const (
 	incorrectKey             = 1030
 	samePassword             = 1031
 	incorrectPassword        = 1032
+	unregistered             = 1033
 
 	userInvalidToken = 2000
 
@@ -105,6 +106,9 @@ func IncorrectLoginOrPassword() *Error {
 }
 func IncorrectPassword() *Error {
 	return &Error{StatusCode: http.StatusOK, Code: incorrectPassword, Message: "incorrect password"}
+}
+func Unregistered() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: unregistered, Message: "user unregistered"}
 }
 func SamePassword() *Error {
 	return &Error{StatusCode: http.StatusOK, Code: samePassword, Message: "same password"}
