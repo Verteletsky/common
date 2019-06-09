@@ -46,6 +46,7 @@ const (
 	incorrectTitle           = 1028
 	incorrectText            = 1029
 	incorrectKey             = 1030
+	samePassword             = 1031
 
 	userInvalidToken = 2000
 
@@ -100,6 +101,9 @@ func IncorrectData() *Error {
 }
 func IncorrectLoginOrPassword() *Error {
 	return &Error{StatusCode: http.StatusOK, Code: incorrectLoginOrPassword, Message: "incorrect login or password"}
+}
+func SamePassword() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: samePassword, Message: "same password"}
 }
 func AlreadyRegistered() *Error {
 	return &Error{StatusCode: http.StatusOK, Code: alreadyRegistered, Message: "user already registered"}
