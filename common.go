@@ -49,6 +49,7 @@ const (
 	samePassword             = 1031
 	incorrectPassword        = 1032
 	unregistered             = 1033
+	codeAlreadySent          = 1034
 
 	userInvalidToken = 2000
 
@@ -151,6 +152,10 @@ func NotVerified() *Error {
 }
 func Banned() *Error {
 	return &Error{StatusCode: http.StatusOK, Code: banned, Message: "user banned"}
+}
+
+func CodeAlreadySent() *Error {
+	return &Error{StatusCode: http.StatusOK, Code: codeAlreadySent, Message: "code already sent"}
 }
 func Incorrect(err error) *Error {
 	if gorm.IsRecordNotFoundError(err) {
