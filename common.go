@@ -159,7 +159,7 @@ func CodeAlreadySent() *Error {
 }
 func Incorrect(err error) *Error {
 	if gorm.IsRecordNotFoundError(err) {
-		return &Error{StatusCode: http.StatusOK, Code: connectionError, Message: "connection error"}
+		return &Error{StatusCode: http.StatusNotFound, Code: http.StatusNotFound, Message: "not found"}
 	}
 	switch err.(type) {
 	case *url.Error:
