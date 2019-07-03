@@ -290,3 +290,7 @@ func SendResponse(context *gin.Context, response interface{}) {
 func SendError(context *gin.Context, error *Error) {
 	context.JSON(error.StatusCode, gin.H{"error": ErrorDto{error.Code, error.Message}})
 }
+
+func SendErrorDto(context *gin.Context, code int, error *ErrorDto) {
+	context.JSON(code, gin.H{"error": error})
+}
